@@ -1,7 +1,11 @@
 Trachouse v1.0.0
-Trac to LightHouse ticket converter
-Author: Shay Arnett http://shayarnett.com
+Trac to Lighthouse ticket importer
+Author: Shay Arnett 
+Website: http://shayarnett.com/trachouse (soonish)
 Email: shayarnett@gmail.com
+
+You will need to obtain a copy of lighthouse.rb from the Lighthouse API
+http://forum.activereload.net/forums/6/topics/44
 
 Please read all commented sections, as most have something you will need to change directly below it
 

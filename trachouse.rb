@@ -1,20 +1,45 @@
 # Trachouse v1.0.0
-# Trac to LightHouse ticket converter
-# Author: Shay Arnett http://shayarnett.com
+# Trac to Lighthouse ticket importer
+# Author: Shay Arnett
+# Website: http://shayarnett.com/trachouse (soonish)
 # Email: shayarnett@gmail.com
 # 
-# 
-# 
-# Please read all commented sections, as most have something you will need to change directly below it
+# You will need to obtain a copy of Lighthouse.rb from the Lighthouse API
+# http://forum.activereload.net/forums/6/topics/44
+#
+# Please read all commented sections, as most have something you
+# will need to change directly below it
 # 
 # USE:
 #
 #   @tickets = populate_tickets # grabs all tickets from trac
 #   import_tickets(@tickets) # import tickets to lighthouse
 #   # profit
-#   # you may want to inspect @tickets or only import a couple of tickets to verify format before processing all tickets
-
-
+#   # you may want to inspect @tickets or only import a couple of 
+#   # tickets to verify format before processing all tickets
+#
+# Copyright (c) 2008 Shay Arnett
+# 
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 
 require 'Rubygems'
 require 'hpricot'
@@ -23,8 +48,6 @@ require 'net/http'
 require 'activesupport'
 require 'activeresource'
 require 'lighthouse'
-require "cgi"
-require "pp"
 
 
 class Ticket < ActiveResource::Base
