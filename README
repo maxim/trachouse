@@ -1,3 +1,21 @@
+Trachouse v1.0.0 fork (adds basic authentication support)
+Author: Maxim Chernyak
+Email: max@bitsonnet.com
+
+This fork adds a simple trac basic authentication support.
+
+USE:
+	Follow instructions in the original README below
+	There are 3 more commented sections you need to edit:
+		- set @trac_basic_auth to true
+		- set @trac_http_user to your basic auth username
+		- set @trac_http_pass to your basic auth password
+
+
+
+Original README
+-------------------------------
+
 Trachouse v1.0.0
 Trac to Lighthouse ticket importer
 Author: Shay Arnett 

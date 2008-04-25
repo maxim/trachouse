@@ -1,23 +1,39 @@
+# Trachouse v1.0.0 fork (adds basic authentication support)
+# Author: Maxim Chernyak
+# Email: max@bitsonnet.com
+# 
+# This fork adds a simple trac basic authentication support.
+# 
+# USE:
+#   Follow instructions in the original README below
+#   There are 3 more commented sections you need to edit:
+#     - set @trac_basic_auth to true
+#     - set @trac_http_user to your basic auth username
+#     - set @trac_http_pass to your basic auth password
+# 
+# 
+# 
+# Original README
+# -------------------------------
+# 
 # Trachouse v1.0.0
 # Trac to Lighthouse ticket importer
-# Author: Shay Arnett
+# Author: Shay Arnett 
 # Website: http://shayarnett.com/trachouse (soonish)
 # Email: shayarnett@gmail.com
 # 
-# You will need to obtain a copy of Lighthouse.rb from the Lighthouse API
+# You will need to obtain a copy of lighthouse.rb from the Lighthouse API
 # http://forum.activereload.net/forums/6/topics/44
-#
-# Please read all commented sections, as most have something you
-# will need to change directly below it
+# 
+# Please read all commented sections, as most have something you will need to change directly below it
 # 
 # USE:
-#
+# 
 #   @tickets = populate_tickets # grabs all tickets from trac
 #   import_tickets(@tickets) # import tickets to lighthouse
 #   # profit
-#   # you may want to inspect @tickets or only import a couple of 
-#   # tickets to verify format before processing all tickets
-#
+#   # you may want to inspect @tickets or only import a couple of tickets to verify format before processing all tickets
+# 
 # Copyright (c) 2008 Shay Arnett
 # 
 # Permission is hereby granted, free of charge, to any person
@@ -40,6 +56,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+
 
 require 'Rubygems'
 require 'hpricot'
@@ -75,6 +92,15 @@ class Ticket < ActiveResource::Base
 
     # @domain + this is the url for logging into track
     @login = '/login'
+    
+    # set to true if your trac is using basic http authentication (provide credentials below)
+    @trac_basic_auth = false
+    
+    # trac http username for trac's basic authentication
+    @trac_http_user = 'http_user'
+    
+    # trac http password for trac's basic authentication
+    @trac_http_pass = 'http_password'
 
     # setup headers for grabbing cookie and tiket info
     @headers = {
@@ -204,6 +230,10 @@ class Ticket < ActiveResource::Base
 
   def unescapeHTML(string)
     # from CGI.rb - don't need the slow just the unescape
+    if string == nil
+      return ''
+    end
+    
     string.gsub(/&(.*?);/n) do
       match = $1.dup
       case match
@@ -258,8 +288,20 @@ class Ticket < ActiveResource::Base
   end
 
   def get_html_for_ticket(ticket)
-    # change url in get2() if you go somewhere other than /ticket/1 to pull up ticket #1
-    resp, data = @http.get2("/ticket/#{ticket}",@headers)
+    #change url if you go somewhere other than /ticket/1 to pull up ticket #1
+    ticket_url = "/ticket/#{ticket}"
+    
+    if @trac_basic_auth
+      resp = Net::HTTP.start(@domain) do |http|
+        req = Net::HTTP::Get.new(ticket_url)
+        req.basic_auth @trac_http_user, @trac_http_pass
+        resp = http.request(req)
+      end
+      data = resp.body
+    else  
+      # change url in get2() if you go somewhere other than /ticket/1 to pull up ticket #1
+      resp, data = @http.get2(ticket_url, @headers)
+    end
     Hpricot(unescapeHTML(data)) if resp.code == '200'
   end
 
@@ -272,7 +314,10 @@ class Ticket < ActiveResource::Base
   end
   
   def import_tickets(tickets)
-    steal_cookie
+    if not @trac_basic_auth
+      steal_cookie
+    end
+    
     new_tickets = []
     tickets.each do |ticket|
       # grab the page for this ticket
@@ -294,7 +339,17 @@ class Ticket < ActiveResource::Base
     # all components
     url = "/report/3"
     ticket_list = []
-    resp, html = @http.get2(url, {'User-Agent' => @useragent})
+    
+    if @trac_basic_auth
+      resp = Net::HTTP.start(@domain) do |http|
+        req = Net::HTTP::Get.new(url)
+        req.basic_auth @trac_http_user, @trac_http_pass
+        resp = http.request(req)
+      end
+      html = resp.body
+    else
+      resp, html = @http.get2(url, {'User-Agent' => @useragent})
+    end
     html = Hpricot(html)
     (html/".ticket").each do |a|
      a.inner_html =~ /\#(\d{1,3})/
